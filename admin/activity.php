@@ -5,26 +5,26 @@
 Эту информацию вы запрашиваете в проекте activity (json-rpc запрос).
 */ 
 
+/*    читаем access.log, и расскадываем его в массив:
+      Адрес[] =>время
+*/
 
-// Вот этот блок конечно надо делать с одним циклом и с одним массивом:
-// построчно считываем, и сразу складываем куда надо, но я расписал подробно, чтобы было понятно чего я хочу добиться.
-
-$log = file_get_contents('access.log');
-if(!$log)
+$fp = fopen('access.log', 'r');
+if(!$fp)
    echo "Error reading access.log";
-   
-$log = '['.substr($log, 0, -2).']';
-$log_arr = json_decode($log);
-unset($log);
 
-$res = array();
-foreach($log_arr as $str){
-   $url = $str[0];
-   $time = $str[1];
-   
-   $res[$url][] = $time;
+$show = array();        // то что нам будет надо
+$res = array();   // промежуточный массив
+
+// читаем построчно и складываем в $res[$url][] => $time
+
+while (($line = fgets($fp)) !== false) {
+//   var_dump($line); continue;
+   $line = substr($line, 0, -2); // remove last ",\n"
+   list($url, $date) = json_decode($line);
+   $res[$url][] = $date;
 }
-unset($log_arr);
+fclose($fp);
 
 $show = array();
 foreach($res as $url=>$time){
@@ -34,6 +34,7 @@ foreach($res as $url=>$time){
    $show[] = array($url, $visits, $last_time);
 }
 unset($res);
+
 
 /*********    PAGING      *********/
 
