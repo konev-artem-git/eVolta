@@ -1,0 +1,4 @@
+AuthName "Authentication required"
+AuthType Basic
+require valid-user
+AuthUserFile C:\AppServ\Apache24\.htpasswd
